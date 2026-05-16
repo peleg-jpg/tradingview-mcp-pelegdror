@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in this project, please report it responsibly.
 
-**Email:** Open a private security advisory via [GitHub Security Advisories](https://github.com/tradesdontlie/tradingview-mcp/security/advisories/new).
+**Email:** Open a private security advisory via [GitHub Security Advisories](https://github.com/peleg-jpg/tradingview-mcp-pelegdror/security/advisories/new). For vulnerabilities that affect the upstream as well, please also notify [tradesdontlie/tradingview-mcp](https://github.com/tradesdontlie/tradingview-mcp/security/advisories/new).
 
 **Do not** open a public issue for security vulnerabilities.
 

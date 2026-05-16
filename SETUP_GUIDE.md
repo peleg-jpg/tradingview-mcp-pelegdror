@@ -70,10 +70,10 @@ After the MCP server is connected, use the `tv_launch` tool — it auto-detects 
 
 **Manual launch by platform:**
 
-Mac:
+Mac (TradingView Desktop v2.14+ requires the `open -a ... --args` form; the bare binary path will fail with `bad option`):
 
 ```bash
-/Applications/TradingView.app/Contents/MacOS/TradingView --remote-debugging-port=9222
+open -a TradingView --args --remote-debugging-port=9222
 ```
 
 Windows:
@@ -93,9 +93,9 @@ Linux:
 
 The MCP server only loads when Claude Code starts. After adding the config:
 
-1. Exit Claude Code (Ctrl+C)
-2. Relaunch Claude Code
-3. The tradingview MCP server should connect automatically
+1. Exit Claude Code by typing `/exit` (Ctrl+C only interrupts the current operation, it doesn't quit)
+2. Relaunch with `claude`
+3. The tradingview MCP server connects automatically
 
 ## Step 6: Verify Connection
 
@@ -135,14 +135,14 @@ Then `tv status`, `tv quote`, `tv pine compile`, etc. work from anywhere.
 
 ## Troubleshooting
 
-| Problem                               | Solution                                                            |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `cdp_connected: false`                | Launch TradingView with `--remote-debugging-port=9222`              |
-| `ECONNREFUSED`                        | TradingView isn't running or port 9222 is blocked                   |
-| MCP server not showing in Claude Code | Check `~/.claude/.mcp.json` syntax, restart Claude Code             |
-| `tv` command not found                | Run `npm link` from the project directory                           |
-| Tools return stale data               | TradingView may still be loading — wait a few seconds               |
-| Pine Editor tools fail                | Open the Pine Editor panel first (`ui_open_panel pine-editor open`) |
+| Problem                               | Solution                                                                                       |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `cdp_connected: false`                | Launch TradingView with `--remote-debugging-port=9222` (Mac: `open -a TradingView --args ...`) |
+| `ECONNREFUSED`                        | TradingView isn't running or port 9222 is blocked                                              |
+| MCP server not showing in Claude Code | Run `claude mcp list` to verify. If missing, re-run step 3. Config lives in `~/.claude.json`.  |
+| `tv` command not found                | Run `npm link` from the project directory                                                      |
+| Tools return stale data               | TradingView may still be loading, wait a few seconds                                           |
+| Pine Editor tools fail                | Open the Pine Editor panel first (`ui_open_panel pine-editor open`)                            |
 
 ## What to Read Next
 

@@ -119,20 +119,13 @@ Or use the MCP tool after setup: `"Use tv_launch to start TradingView in debug m
 
 ### 4. Add to Claude Code
 
-Add to `~/.claude/.mcp.json` (merge with any existing servers):
+Use the official CLI; it validates the entry and writes to the correct config file (`~/.claude.json` under `mcpServers`):
 
-```json
-{
-  "mcpServers": {
-    "tradingview": {
-      "command": "node",
-      "args": ["/Users/YOUR_USERNAME/tradingview-mcp-pelegdror/src/server.js"]
-    }
-  }
-}
+```bash
+claude mcp add --scope user tradingview node ~/tradingview-mcp-pelegdror/src/server.js
 ```
 
-Replace `YOUR_USERNAME` with your actual username. On Mac: `echo $USER` to check.
+Verify with `claude mcp list`. You should see `tradingview` in the output.
 
 ### 5. Verify
 
@@ -312,16 +305,16 @@ Full command list: `tv --help`
 
 ## Troubleshooting
 
-| Problem                                 | Solution                                                                              |
-| --------------------------------------- | ------------------------------------------------------------------------------------- |
-| `cdp_connected: false`                  | TradingView isn't running with `--remote-debugging-port=9222`. Use the launch script. |
-| `ECONNREFUSED`                          | TradingView isn't running or port 9222 is blocked                                     |
-| MCP server not showing in Claude Code   | Check `~/.claude/.mcp.json` syntax, restart Claude Code                               |
-| `tv` command not found                  | Run `npm link` from the project directory                                             |
-| `morning_brief` — "No rules.json found" | Run `cp rules.example.json rules.json` and fill it in                                 |
-| `morning_brief` — watchlist empty       | Add symbols to the `watchlist` array in `rules.json`                                  |
-| Tools return stale data                 | TradingView still loading — wait a few seconds                                        |
-| Pine Editor tools fail                  | Open Pine Editor panel first: `ui_open_panel pine-editor open`                        |
+| Problem                                 | Solution                                                                                      |
+| --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `cdp_connected: false`                  | TradingView isn't running with `--remote-debugging-port=9222`. Use the launch script.         |
+| `ECONNREFUSED`                          | TradingView isn't running or port 9222 is blocked                                             |
+| MCP server not showing in Claude Code   | Run `claude mcp list` to verify. If missing, re-run step 4. Config lives in `~/.claude.json`. |
+| `tv` command not found                  | Run `npm link` from the project directory                                                     |
+| `morning_brief` — "No rules.json found" | Run `cp rules.example.json rules.json` and fill it in                                         |
+| `morning_brief` — watchlist empty       | Add symbols to the `watchlist` array in `rules.json`                                          |
+| Tools return stale data                 | TradingView still loading — wait a few seconds                                                |
+| Pine Editor tools fail                  | Open Pine Editor panel first: `ui_open_panel pine-editor open`                                |
 
 ---
 

@@ -25,10 +25,20 @@ function Have  ($cmd) { [bool](Get-Command $cmd -ErrorAction SilentlyContinue) }
 
 Say "Detected: Windows"
 
-# winget is the package manager. It's preinstalled on Windows 10 1809+ / 11.
+# winget is the package manager. Preinstalled on Windows 10 1809+ / 11 with App Installer.
 if (-not (Have "winget")) {
-    Warn "winget not found. Install it from the Microsoft Store ('App Installer') and re-run this script."
+    Warn "winget not found. Two ways to get it:"
+    Warn "  1. Open Microsoft Store, search 'App Installer', click Install. Then re-run this script."
+    Warn "  2. On Windows Server / LTSC, download from https://github.com/microsoft/winget-cli/releases"
+    Warn "Or, install git + Node.js 18+ manually, then re-run this script (it will pick up from there)."
     exit 1
+}
+
+# Refresh PATH so binaries installed by winget in this session are visible.
+# Reads Machine + User PATH from the registry. Note: cached PowerShell command lookups
+# may still miss freshly installed binaries; if you hit that, open a new PowerShell and re-run.
+function Refresh-Path {
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
 
 # -------- 1. git --------
@@ -37,7 +47,7 @@ if (Have "git") {
 } else {
     Say "Installing git..."
     winget install --id Git.Git --silent --accept-source-agreements --accept-package-agreements
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    Refresh-Path
 }
 
 # -------- 2. Node.js 18+ --------
@@ -54,7 +64,7 @@ if (Have "node") {
 if ($needNode) {
     Say "Installing Node.js LTS..."
     winget install --id OpenJS.NodeJS.LTS --silent --accept-source-agreements --accept-package-agreements
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    Refresh-Path
 }
 
 # -------- 3. Claude Code --------
@@ -67,15 +77,19 @@ if (Have "claude") {
 
 # -------- 4. TradingView Desktop --------
 $tvPath = Join-Path $env:LOCALAPPDATA "TradingView\TradingView.exe"
+$script:tvInstalled = $true
 if (Test-Path $tvPath) {
     Ok "TradingView Desktop already installed"
 } else {
     Say "Installing TradingView Desktop..."
-    $tvWinget = winget search --id TradingView.TradingView 2>$null
-    if ($tvWinget -match "TradingView.TradingView") {
-        winget install --id TradingView.TradingView --silent --accept-source-agreements --accept-package-agreements
+    # Correct winget PackageIdentifier is TradingView.TradingViewDesktop
+    winget install --id TradingView.TradingViewDesktop --silent --accept-source-agreements --accept-package-agreements 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Warn "winget install of TradingView Desktop failed (exit $LASTEXITCODE)."
+        Warn "Download manually from https://www.tradingview.com/desktop/ and re-run this script."
+        $script:tvInstalled = $false
     } else {
-        Warn "TradingView Desktop not in winget. Download manually from https://www.tradingview.com/desktop/"
+        Ok "TradingView Desktop installed"
     }
 }
 
@@ -105,42 +119,64 @@ if (Test-Path $rulesPath) {
 }
 
 # -------- 8. register MCP server --------
+$script:mcpRegistered = $false
 if (Have "claude") {
     Say "Registering MCP server with Claude Code..."
     $serverPath = Join-Path $InstallDir "src\server.js"
-    $existing = claude mcp list 2>$null | Select-String "^tradingview"
-    if ($existing) {
+    # Use 'claude mcp get' which exits non-zero if not registered (more reliable than parsing list output)
+    claude mcp get tradingview 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
         Ok "tradingview MCP server already registered"
+        $script:mcpRegistered = $true
     } else {
-        try {
-            claude mcp add --scope user tradingview node $serverPath
+        claude mcp add --scope user tradingview node $serverPath 2>$null
+        if ($LASTEXITCODE -eq 0) {
             Ok "MCP server registered"
-        } catch {
-            Warn "Could not register MCP server. Run this manually after authenticating Claude Code:"
+            $script:mcpRegistered = $true
+        } else {
+            Warn "Could not register MCP server (claude may need authentication first)."
+            Warn "After running 'claude' to log in, run:"
             Warn "  claude mcp add --scope user tradingview node `"$serverPath`""
         }
     }
 }
 
+# -------- open rules.json for the user to edit --------
+try { Start-Process notepad $rulesPath } catch { }
+
 # -------- final message --------
 Write-Host ""
 Write-Host "================ INSTALL COMPLETE ================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Manual steps remaining (each takes ~30 seconds):"
+
+if (-not $script:tvInstalled) {
+    Write-Host "!! TradingView Desktop did not install automatically." -ForegroundColor Yellow
+    Write-Host "   Download it from https://www.tradingview.com/desktop/ BEFORE step 3 below."
+    Write-Host ""
+}
+if (-not $script:mcpRegistered) {
+    Write-Host "!! MCP server was not registered (you need to authenticate Claude Code first)." -ForegroundColor Yellow
+    Write-Host "   After step 1 below, also run:"
+    Write-Host "     claude mcp add --scope user tradingview node `"$serverPath`""
+    Write-Host ""
+}
+
+Write-Host "What's left for you to do (5 quick steps):"
 Write-Host ""
-Write-Host "  1. First time using Claude Code? Authenticate:"
+Write-Host "  1. Authenticate Claude Code:"
 Write-Host "       claude"
-Write-Host "     ...and follow the browser login prompt. Then /exit."
+Write-Host "     A browser opens to log you in. When done, type /exit and press Enter."
 Write-Host ""
-Write-Host "  2. Open TradingView Desktop, log in, then quit it completely."
+Write-Host "  2. Open TradingView Desktop. Log in with your account."
+Write-Host "     Then fully quit it: right-click the dock icon -> Quit (Cmd-Q does the same)."
+Write-Host "     (Closing the window is NOT enough; the app keeps running in background.)"
 Write-Host ""
-Write-Host "  3. Relaunch TradingView with the debug port:"
+Write-Host "  3. Relaunch TradingView with the debug port enabled:"
 Write-Host "       & '$tvPath' --remote-debugging-port=$CdpPort"
 Write-Host ""
-Write-Host "  4. Edit your trading rules:"
-Write-Host "       notepad $rulesPath"
+Write-Host "  4. (Notepad just opened your rules.json. Fill in your watchlist + bias criteria + risk rules and save.)"
 Write-Host ""
-Write-Host "  5. Restart Claude Code, then ask:"
+Write-Host "  5. Open a NEW terminal, run 'claude', and ask:"
 Write-Host "       Run tv_health_check"
 Write-Host ""
 Write-Host "     Expected: { 'success': true, 'cdp_connected': true, ... }"
