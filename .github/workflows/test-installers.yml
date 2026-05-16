@@ -1,0 +1,92 @@
+name: Test installers on real VMs
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "install.sh"
+      - "install.ps1"
+      - ".github/workflows/test-installers.yml"
+
+jobs:
+  macos:
+    name: macOS install.sh
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Run install.sh end-to-end
+        shell: bash
+        run: |
+          set -o pipefail
+          curl -fsSL https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.sh | bash
+      - name: Verify post-install state
+        shell: bash
+        run: |
+          set -e
+          echo "--- claude version ---"
+          command -v claude && claude --version || echo "claude not on PATH"
+          echo "--- claude mcp list ---"
+          claude mcp list 2>&1 | head -20 || true
+          echo "--- repo on disk ---"
+          ls -la "$HOME/tradingview-mcp-pelegdror" | head -20
+          echo "--- rules.json exists ---"
+          test -f "$HOME/tradingview-mcp-pelegdror/rules.json" && echo "yes" || (echo "no"; exit 1)
+          echo "--- node version ---"
+          node --version
+          echo "--- TradingView.app installed? ---"
+          test -d /Applications/TradingView.app && echo "yes" || echo "no (warning only, not a failure)"
+
+  ubuntu:
+    name: Ubuntu install.sh
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Run install.sh end-to-end
+        shell: bash
+        run: |
+          set -o pipefail
+          curl -fsSL https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.sh | bash
+      - name: Verify post-install state
+        shell: bash
+        run: |
+          set -e
+          echo "--- claude version ---"
+          command -v claude && claude --version || echo "claude not on PATH"
+          echo "--- claude mcp list ---"
+          claude mcp list 2>&1 | head -20 || true
+          echo "--- repo on disk ---"
+          ls -la "$HOME/tradingview-mcp-pelegdror" | head -20
+          echo "--- rules.json exists ---"
+          test -f "$HOME/tradingview-mcp-pelegdror/rules.json" && echo "yes" || (echo "no"; exit 1)
+          echo "--- node version ---"
+          node --version
+
+  windows:
+    name: Windows install.ps1
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Run install.ps1 end-to-end
+        shell: pwsh
+        run: |
+          irm https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.ps1 | iex
+      - name: Verify post-install state
+        shell: pwsh
+        run: |
+          Write-Host "--- claude version ---"
+          if (Get-Command claude -ErrorAction SilentlyContinue) {
+              claude --version
+          } else {
+              Write-Host "claude not on PATH"
+          }
+          Write-Host "--- claude mcp list ---"
+          try { claude mcp list 2>&1 | Select-Object -First 20 } catch { Write-Host "claude mcp list failed: $_" }
+          Write-Host "--- repo on disk ---"
+          Get-ChildItem "$HOME\tradingview-mcp-pelegdror" | Select-Object -First 20 | Format-Table Name
+          Write-Host "--- rules.json exists ---"
+          if (Test-Path "$HOME\tradingview-mcp-pelegdror\rules.json") { Write-Host "yes" } else { Write-Host "no"; exit 1 }
+          Write-Host "--- node version ---"
+          node --version
+          Write-Host "--- TradingView installed? ---"
+          $tv = Join-Path $env:LOCALAPPDATA "TradingView\TradingView.exe"
+          if (Test-Path $tv) { Write-Host "yes" } else { Write-Host "no (warning only, not a failure)" }
