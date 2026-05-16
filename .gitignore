@@ -1,0 +1,18 @@
+node_modules/
+screenshots/
+scripts/current.pine
+temp_*
+*.log
+discovery-log.json
+
+# Personal trading rules (created from rules.example.json on install)
+# Remove this line if you want to commit your own rules.
+rules.json
+
+# Secrets, never commit
+.env
+.env.*
+!.env.example
+
+# Install-time symlink created by the one-shot setup
+AGENTS.md
