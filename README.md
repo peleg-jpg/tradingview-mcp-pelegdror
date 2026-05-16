@@ -34,13 +34,13 @@ Bootstraps everything on a blank machine: git, Node.js, Claude Code, TradingView
 **macOS / Linux:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.sh | bash
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.ps1 | iex
 ```
 
 When the script finishes, follow the 5 short manual steps it prints (authenticate Claude Code, launch TradingView with the debug port, fill in `rules.json`, run `tv_health_check`).
@@ -55,7 +55,7 @@ If you already have Claude Code installed, paste this prompt and it will handle 
 
 ```
 Set up TradingView MCP Pelegdror for me.
-Clone https://github.com/pelegdror/tradingview-mcp-pelegdror.git to ~/tradingview-mcp-pelegdror, run npm install, then register it with: claude mcp add --scope user tradingview node ~/tradingview-mcp-pelegdror/src/server.js
+Clone https://github.com/peleg-jpg/tradingview-mcp-pelegdror.git to ~/tradingview-mcp-pelegdror, run npm install, then register it with: claude mcp add --scope user tradingview node ~/tradingview-mcp-pelegdror/src/server.js
 Then copy rules.example.json to rules.json and open it so I can fill in my trading rules.
 Finally restart and verify with tv_health_check.
 ```
@@ -76,7 +76,7 @@ Finally restart and verify with tv_health_check.
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/pelegdror/tradingview-mcp-pelegdror.git ~/tradingview-mcp-pelegdror
+git clone https://github.com/peleg-jpg/tradingview-mcp-pelegdror.git ~/tradingview-mcp-pelegdror
 cd ~/tradingview-mcp-pelegdror
 npm install
 ```

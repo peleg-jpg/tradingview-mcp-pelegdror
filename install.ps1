@@ -5,7 +5,7 @@
 #   MCP server registration with Claude Code.
 #
 # Usage (open PowerShell, paste this line):
-#   irm https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.ps1 | iex
 #
 # Override install location:
 #   $env:INSTALL_DIR = "C:\my\path"; irm ... | iex
@@ -14,7 +14,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$RepoUrl     = "https://github.com/pelegdror/tradingview-mcp-pelegdror.git"
+$RepoUrl     = "https://github.com/peleg-jpg/tradingview-mcp-pelegdror.git"
 $InstallDir  = if ($env:INSTALL_DIR) { $env:INSTALL_DIR } else { Join-Path $HOME "tradingview-mcp-pelegdror" }
 $CdpPort     = 9222
 

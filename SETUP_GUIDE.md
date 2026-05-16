@@ -9,13 +9,13 @@ If the user just wants it working with one command, run the appropriate installe
 **macOS / Linux:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.sh | bash
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.ps1 | iex
 ```
 
 That script handles steps 1-3 below automatically and registers the MCP server via `claude mcp add`. Then continue with steps 4-7 manually (TradingView login + debug-port launch, rules.json edits, restart, verify).
@@ -25,7 +25,7 @@ For a guided manual install, follow each step below.
 ## Step 1: Clone and Install
 
 ```bash
-git clone https://github.com/pelegdror/tradingview-mcp-pelegdror.git ~/tradingview-mcp-pelegdror
+git clone https://github.com/peleg-jpg/tradingview-mcp-pelegdror.git ~/tradingview-mcp-pelegdror
 cd ~/tradingview-mcp-pelegdror
 npm install
 ```
@@ -60,10 +60,6 @@ Verify with:
 claude mcp list
 claude mcp get tradingview
 ```
-
-Replace `YOUR_USERNAME` with the user's actual system username. Run `echo $USER` (Mac/Linux) or `echo %USERNAME%` (Windows) to find it.
-
-If the config file already exists and has other servers, merge the `tradingview` entry into the existing `mcpServers` object. Do not overwrite other servers.
 
 ## Step 4: Launch TradingView Desktop
 

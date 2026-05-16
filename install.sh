@@ -7,7 +7,7 @@
 #   this repo, npm deps, rules.json, MCP server registration with Claude Code.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/pelegdror/tradingview-mcp-pelegdror/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/peleg-jpg/tradingview-mcp-pelegdror/main/install.sh | bash
 #
 # Override install location:
 #   INSTALL_DIR=/custom/path curl -fsSL ... | bash
@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/pelegdror/tradingview-mcp-pelegdror.git"
+REPO_URL="https://github.com/peleg-jpg/tradingview-mcp-pelegdror.git"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/tradingview-mcp-pelegdror}"
 CDP_PORT=9222
 
