@@ -201,6 +201,41 @@ Claude reads `CLAUDE.md` automatically when working in this project. It contains
 
 ---
 
+## Bundled Skills (5 ready-to-use slash commands)
+
+The repo ships 5 "skills" in [skills/](skills/) and 1 subagent in [agents/](agents/). These are not auto-installed by the one-liner; copy them into your Claude config and they become slash commands you can type in any project.
+
+**Install them:**
+
+```bash
+mkdir -p ~/.claude/skills ~/.claude/agents
+cp -r ~/tradingview-mcp-pelegdror/skills/* ~/.claude/skills/
+cp ~/tradingview-mcp-pelegdror/agents/performance-analyst.md ~/.claude/agents/
+```
+
+Then restart Claude Code. Type `/` and you'll see them in the menu.
+
+### What each one does (plain English)
+
+**`/chart-analysis`** - "Look at this chart and tell me what I'm seeing."
+Pulls up the symbol, slaps RSI/EMA/MACD/whatever on it, screenshots the result, then tells you the current price, key support and resistance, what the indicators are saying, and a bullish/bearish/neutral read with reasoning. Like having an analyst look over your shoulder for 30 seconds.
+
+**`/multi-symbol-scan`** - "Compare these 5 tickers, which one's set up best right now?"
+Loops through a watchlist or any list you give it (e.g. `[ES1!, NQ1!, YM1!, RTY1!]`), checks each one against your criteria (indicator readings, strategy results, visual patterns), and ranks them. Screenshots the top 1-2. A conversational screener.
+
+**`/pine-develop`** - "Build me an indicator/strategy that does X."
+Writes the Pine Script v6 code, pushes it into your TradingView Pine Editor, hits compile, reads the errors, fixes them itself, and repeats until 0 errors. Then screenshots the working result so you can verify. Removes the whole "switching between Pine Editor and Stack Overflow" loop.
+
+**`/replay-practice`** - "Let's paper trade March 2024 like it's live."
+Rewinds the chart to a date you pick, steps through bars one at a time (or autoplays at your chosen speed). When you say "buy" or "sell", it places the trade. Tracks your P&L. Reviews the session at the end with stats and lessons. Pure practice mode without real money.
+
+**`/strategy-report`** - "Tell me if this strategy is actually any good."
+After you backtest a Pine strategy, generates a full performance breakdown: net profit, win rate, profit factor (target >1.5), max drawdown, average winner vs loser, equity curve shape, long vs short performance, time in market. Ends with concrete recommendations like "win rate <50% but profit factor >1, tighten your entries" or "max drawdown >20%, fix your position sizing."
+
+**`performance-analyst`** (subagent, not a slash command) - Same intent as `/strategy-report` but heavier. A dedicated Sonnet-powered subagent runs the full report autonomously so your main chat stays clean. Invoke via the Agent tool with `subagent_type: "performance-analyst"`.
+
+---
+
 ## Tool Reference (81 MCP tools)
 
 ### Morning Brief (new in this fork)
